@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindfulCart - Sistem Evaluare</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f4f6f8;
+        }
+        .navbar-custom {
+            background-color: #ffffff;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .form-card {
+            background-color: #fcfbf7;
+            border: 1px solid #e0dfd5;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+        .safe-container {
+            background: linear-gradient(135deg, #434343 0%, #1c1c1c 100%);
+            border: 12px solid #2a2a2a;
+            border-radius: 20px;
+            box-shadow: 15px 15px 40px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,0,0,0.8);
+            position: relative;
+            color: white;
+            padding: 40px;
+            min-height: 480px;
+            display: flex;
+            align-items: center;
+        }
+        .safe-hinge-1, .safe-hinge-2 {
+            position: absolute;
+            right: -20px;
+            width: 20px;
+            height: 70px;
+            background: linear-gradient(to right, #555, #333);
+            border-radius: 0 10px 10px 0;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+        .safe-hinge-1 {top: 80px; }
+        .safe-hinge-2 {bottom: 80px; }
+
+        .safe-wheel {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 15px solid #555;
+            background: radial-gradient(circle, #333 40%, #111 100%);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.8), inset 0 5px 10px rgba(255,255,255,0.1);
+            position: relative;
+            margin: 0 auto;
+        }
+        .safe-wheel::before, .safe-wheel::after {
+            content: '';
+            position: absolute;
+            background: #666;
+            width: 14px;
+            height: 160px;
+            top: -25px;
+            left: 48px;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+        .safe-wheel::after  {
+            transform: rotate(90deg);
+        }
+        .safe-wheel-center{
+            position: absolute; 
+            background: #888;
+            width: 40px;
+            height: 40px;
+            top: 35px;
+            left: 35px;
+            border-radius: 50%;
+            box-shadow: inset 0 2px 5px rgba(255,255,255,0.5);
+        }
+        
+        /* Zona pentru Poza Blurata */
+        .item-blocat-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .item-blocat {
+            border-radius: 8px;
+            max-width: 130px;
+            height: auto;
+            border: 3px solid #e74c3c;
+            filter: blur(4px) grayscale(30%);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            transition: 0.3s;
+        }
+        .item-blocat:hover {
+            filter: blur(0px) grayscale(0%);
+        }
+        .lock-icon-badge {
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            background-color: #e74c3c;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            border: 2px solid #1c1c1c;
+        }
+        
+        /* Caseta textului AI */
+        .ai-verdict-box {
+            background-color: rgba(243, 156, 18, 0.1);
+            border-left: 3px solid #f39c12;
+            color: #dcdde1;
+            padding: 10px 15px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            border-radius: 0 6px 6px 0;
+            font-style: italic;
+        }
+
+        .safe-items-container {
+            max-height: 550px;
+            overflow-y: auto;
+            padding-right: 15px;
+        }
+        .safe-items-container::-webkit-scrollbar{
+            width: 8px;
+        }
+        .safe-items-container::-webkit-scrollbar-track{
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+        }
+        .safe-items-container::-webkit-scrollbar-thumb{
+            background: #7f8c8d;
+            border-radius: 10px;
+        }
+        .item-card {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid #555;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        /* Ajustari utilitare de text */
+        .btn-action {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+
+
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <nav class="navbar navbar-expand-lg navbar-custom px-4 shadow-sm">
+        <a class="navbar-brand text-success fw-bold" href="#">MindfulCart</a>
+        <div class="ms-auto text-end">
+            <span class="me-3 text-muted small">Utilizator: <strong>{{ current_user.username }}</strong></span>
+            <a href="/logout" class="btn btn-sm btn-outline-secondary">Deconectare</a>
+        </div>
+
+    
+    </nav>
+
+    <div class="container mt-5 mb-5">
+        <div class="row">
+            <!-- STÂNGA: FORMULARUL DE ADĂUGARE -->
+            <div class="col-lg-4 mb-4">
+                <div class="card form-card p-4 h-100">
+                    <h5 class="fw-bold mb-4">Înregistrare Produs</h5>
+
+                    <form action="/analizeaza" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label text-muted fw-bold small">Fișier imagine</label>
+                            <input type="file" class="form-control form-control-sm bg-light" name="poza_produs" accept="image/*" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted fw-bold small">Valoare (RON)</label>
+                            <input type="number" step="0.01" class="form-control form-control-sm bg-light" name="pret_produs" required placeholder="0.00">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted fw-bold small">Justificare decizie</label>
+                            <textarea class="form-control form-control-sm bg-light" name="motiv" rows="2" required placeholder="Motivul dorinței..."></textarea>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label text-muted fw-bold small">Sursă URL (Opțional)</label>
+                            <input type="url" class="form-control form-control-sm bg-light" name="link_produs" placeholder="https://...">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-dark w-100 fw-bold py-2 btn-action">Blochează Produsul</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- DREAPTA: SEIFUL ȘI STATISTICILE -->
+            <div class="col-lg-8">
+                
+                <!-- PANOUL DE STATISTICI & RAPORT CSV -->
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <div class="card p-3 border-0 shadow-sm" style="background-color: #e8f5e9; border-left: 4px solid #2ecc71 !important;">
+                            <span class="text-success small fw-bold text-uppercase">Bani Salvați (Decizii Raționale)</span>
+                            <h4 class="text-success mb-0 fw-bold">{{ bani_salvati | default('0') }} RON</h4>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card p-3 border-0 shadow-sm" style="background-color: #ffebee; border-left: 4px solid #e74c3c !important; display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+                            <div>
+                                <span class="text-danger small fw-bold text-uppercase">Bani Cheltuiți</span>
+                                <h4 class="text-danger mb-0 fw-bold">{{ bani_cheltuiti | default('0') }} RON</h4>
+                            </div>
+                            <a href="/raport" class="btn btn-sm btn-outline-dark fw-bold">Descarcă Raport CSV</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEIFUL PROPRIU-ZIS -->
+                {% if not produse %}
+                <div class="safe-container justify-content-center text-center opacity-75">
+                    <div>
+                        <h4 class="text-secondary mb-2">Seiful este gol</h4>
+                        <p class="text-secondary small">Nu există produse în perioada de evaluare.</p>
+                    </div>
+                </div>
+                {% else %}
+                <div class="safe-container">
+                    <div class="safe-hinge-1"></div>
+                    <div class="safe-hinge-2"></div>
+
+                    <div class="row w-100 align-items-start">
+                        <!-- Rotița -->
+                        <div class="col-md-4 text-center mb-4 mb-md-0 d-flex flex-column align-items-center justify-content-center" style="min-height: 400px;">
+                            <div class="safe-wheel">
+                                <div class="safe-wheel-center"></div>
+                            </div>
+                            <span class="text-secondary small fw-bold mt-4" style="letter-spacing: 2px;">STATUS: ÎNCUIAT</span>
+                        </div>
+                        
+                        <!-- Lista de produse -->
+                        <div class="col-md-8 safe-items-container">
+                            {% for produs in produse %}
+                            <div class="item-card">
+                                
+                                <div class="row align-items-center">
+                                    <!-- Poza Blurata -->
+                                    <div class="col-sm-4 text-center mb-3 mb-sm-0">
+                                        <div class="item-blocat-wrapper">
+                                            <img src="/static/uploads/{{ produs.nume_poza }}" class="item-blocat" alt="Produs">
+                                            <div class="lock-icon-badge">X</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Detalii Produs -->
+                                    <div class="col-sm-8">
+                                        <div class="d-flex justify-content-between align-items-start mb-1">
+                                            <h5 class="text-light text-capitalize fw-bold mb-0" style="font-size: 1.1rem;">{{ produs.nume }}</h5>
+                                            {% if produs.link_produs %}
+                                                <a href="{{ produs.link_produs }}" target="_blank" class="btn btn-sm btn-outline-info" style="font-size: 0.7rem; padding: 2px 8px;">Sursă Externă</a>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <span class="badge bg-secondary mb-2" style="font-size: 0.65rem; letter-spacing: 0.5px;">Analiză Sistem AI</span>
+                                        
+                                        <!-- Caseta AI -->
+                                        <div class="ai-verdict-box">
+                                            "{{ produs.raspuns_ai }}"
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Impact Financiar -->
+                                <div class="mt-2 p-2 border border-danger rounded text-start" style="background-color: rgba(232, 75, 60, 0.1);">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <strong class="text-danger" style="font-size: 0.85rem;">Risc Financiar: {{ produs.procent_venit }}% din venit</strong>
+                                        <span class="text-light fw-bold" style="font-size: 0.9rem;">{{ produs.pret }} RON</span>
+                                    </div>
+                                </div>
+
+                                <!-- Timer-->
+                                 <div class="mt-3 text-center p-3 rounded" style="background-color: rgba(255,255,255,0.1); border: 1px dashed #7f8c8d">
+                
+                                    <span class="text-warning small fw-bold text-uppercase" style="letter-spacing: 1px;">Timp de evaluare rămas: </span><br>
+                                    <span class="text-light fs-5 fw-bold countdown-timer" data-start="{{ produs.data_adaugare.strftime('%Y-%m-%dT%H:%M:%S')}}">Se calculeaza...</span>
+                                 </div>
+
+
+                                <!-- === BUTOANELE DE STARE FARA EMOJI === -->
+                                <div class="mt-3 d-flex justify-content-end gap-2">
+                                    <a href="/decide/{{ produs.id }}/cumparat" class="btn btn-outline-secondary btn-action text-light" style="border-color: #555;">Achiziționat</a>
+                                    <a href="/decide/{{ produs.id }}/salvat" class="btn btn-success btn-action text-dark fw-bold">Decizie Rațională (Salvat)</a>
+                                </div>
+
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT CRONOMETRU JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const timers = document.querySelectorAll('.countdown-timer');
+            
+            timers.forEach(function(timerEl) {
+                // Preia data adaugarii (formatata din Python) si adauga 7 zile in milisecunde
+                const startDateStr = timerEl.getAttribute('data-start');
+                // Asigura parsarea corecta pe toate browserele
+                const startDate = new Date(startDateStr.replace(/-/g, '/').replace('T', ' ')); 
+                
+                if (isNaN(startDate.getTime())) {
+                    timerEl.innerHTML = "Timp indisponibil";
+                    return;
+                }
+
+                const endDate = new Date(startDate.getTime() + (7 * 24 * 60 * 60 * 1000));
+
+                const interval = setInterval(function() {
+                    const now = new Date().getTime();
+                    const distance = endDate - now;
+
+                    // Daca timpul a expirat
+                    if (distance < 0) {
+                        timerEl.innerHTML = "Perioada de evaluare s-a încheiat. Decizie necesară.";
+                        timerEl.classList.remove('text-warning', 'text-light');
+                        timerEl.classList.add('text-danger');
+                        clearInterval(interval);
+                        return;
+                    }
+
+                    // Calcul matematic pentru zile, ore, minute, secunde
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    timerEl.innerHTML = days + "z " + hours + "h " + minutes + "m " + seconds + "s";
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html>

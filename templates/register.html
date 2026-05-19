@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Înregistrare - MindfulCart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light d-flex align-items-center justify-content-center" style="height: 100vh;">
+    <div class="card p-4 shadow" style="width: 350px;">
+        <h3 class="text-center text-success mb-4">Creeare Cont 💭🛒</h3>
+        <form action="/register" method="POST">
+            <div class="mb-3">
+                <label>Nume utilizator</label>
+                <input type="text" class="form-control" name="username" required>
+
+            </div>
+            <div class="mb-3">
+                <label>Parolă</label>
+                <input type="password" class="form-control" name="password"  required>
+            </div>
+            <div class="mb-3">
+                <label>Venit lunar / Alocație (RON)</label>
+                <input type="number" step="0.1" class="form-control" name="venit_lunar" required placeholder="ex: 500">
+                <small class="text-muted">Avem nevoie de asta pentru a calcula impactul cumpărăturilor tale.</small>
+            </div>
+            <button type="submit" class="btn btn-success w-100 mt-2">Înregistrează-te</button>
+        </form>
+        <p class="text-center mt-3 small">Ai deja cont? <a href="/login">Loghează-te aici</a></p>
+    </div>
+</body>
+</html>

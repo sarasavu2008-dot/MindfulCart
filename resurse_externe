@@ -1,0 +1,28 @@
+DECLARAȚIE PRIVIND RESURSELE EXTERNE FOLOSITE
+
+Declarăm utilizarea următoarelor resurse externe open-source și third-party (biblioteci, framework-uri, modele AI), care au fost integrate pentru a facilita dezvoltarea aplicației noastre:
+
+1. FRAMEWORK-URI ȘI BIBLIOTECI BACKEND (Ecosistemul Python)
+• Flask: Folosit ca micro-framework web pentru gestionarea rutelor, sesiunilor și logicii de server.
+• SQLAlchemy (prin Flask-SQLAlchemy): Folosit ca sistem ORM (Object-Relational Mapping) pentru interacțiunea securizată cu baza de date SQLite.
+• Pywebview: Bibliotecă open-source folosită pentru a încapsula interfața web într-o fereastră nativă de desktop (arhitectură hibridă).
+
+2. RESURSE FRONTEND (Interfață Grafică)
+• Bootstrap 5: Framework CSS folosit pentru crearea unui design modern, adaptabil și stilizarea componentelor vizuale (carduri, butoane, sistem de alerte).
+
+3. INTELIGENȚĂ ARTIFICIALĂ ȘI MACHINE LEARNING
+• Google Gemini API (modelul 2.5 Flash): Serviciu LLM extern apelat prin cereri de rețea (API) pentru generarea asistenței financiare și evaluarea raportului preț/venit.
+• HuggingFace Transformers (Modelul ViT - Vision Transformer): Model pre-antrenat open-source, folosit exclusiv pentru clasificarea și recunoașterea locală a imaginilor introduse de utilizator.
+• PyTorch: Motorul de bază instalat pentru a putea rula modelul ViT local, direct pe procesorul sistemului (CPU).
+
+4. FRAGMENTE DE COD (SNIPPETS)
+• Script Cronometru (JavaScript): Logica matematică a timer-ului de 7 zile (countdown) a fost preluată din tutorialele open-source W3Schools (Sursă: https://www.w3schools.com/howto/howto_js_countdown.asp). Codul a fost ulterior modificat și adaptat de noi pentru a prelua datele dinamice injectate din backend-ul nostru Flask (data adăugării produsului în baza de date) și pentru a rula independent pe mai multe elemente din pagină.
+• Inspirație UI (Seif): Designul vizual al "Seifului" (butucul, balamalele, efectele metalice) a fost implementat de noi folosind CSS pur, dar conceptul vizual și modul de îmbinare a gradienților (CSS Art) au fost inspirate din experimentele open-source de pe platforma CodePen (Sursă generală: https://codepen.io).
+
+Documentatie - link-uri ajutatoare:
+https://flask-sqlalchemy.readthedocs.io/en/stable/config/#flask_sqlalchemy.config.SQLALCHEMY_DATABASE_URI
+https://flask.palletsprojects.com/en/stable/quickstart/#http-methods
+https://flask.palletsprojects.com/en/stable/quickstart/#html-escaping
+https://werkzeug.palletsprojects.com/en/stable/
+https://www.w3schools.com/Html/
+https://www.w3schools.com/css/
